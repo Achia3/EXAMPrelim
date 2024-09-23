@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Calculator</title>
+    
+    <style>
+        #box1 {
+            border: solid 1px;
+            width: 700px;
+            height: 900px;
+            background-color: hsl(0, 0%, 92%);
+            box-shadow: 3px 3px 5px;
+            position: absolute;
+            margin-left: 25%;
+            margin-right: 50%;
+        }
+
+        #input1, #input2, #input3, #input4, #input5 {
+            width: 8rem;
+        }
+
+        #input1 {
+            position: absolute;
+            margin-top: 280.3px;
+            margin-left: 4rem;
+        }
+
+        #input2 {
+            position: absolute;
+            margin-top: 16rem;
+            margin-left: 18rem;
+        }
+
+        #input3 {
+            position: absolute;
+            margin-top: 16rem;
+            margin-left: 32rem;
+        }
+
+        #input4 {
+            position: absolute;
+            margin-top: 23rem;
+            margin-left: 26rem;
+        }
+
+        #input5 {
+            position: absolute;
+            margin-top: 23rem;
+            margin-left: 10rem;
+        }
+
+        #absenttext {
+            position: absolute;
+            margin-top: 15rem;
+            margin-left: 6.3rem;
+        }
+
+        #p2 {
+            position: absolute;
+            margin-top: 14rem;
+            margin-left: 18rem;
+        }
+
+        #p3 {
+            position: absolute;
+            margin-top: 14rem;
+            margin-left: 32rem;
+        }
+
+        #p4 {
+            position: absolute;
+            margin-top: 21rem;
+            margin-left: 26rem;
+        }
+
+        #p5 {
+            position: absolute;
+            margin-top: 21rem;
+            margin-left: 11em;
+        }
+
+        h1 {
+            margin-left: 14rem;
+            display: flex;
+            position: absolute;
+            margin-top: 5rem;
+        }
+
+        #button1 {
+            margin-top: 30rem;
+            position: absolute;
+            margin-left: 43%;
+            width: 10rem;
+            height: 3rem;
+            border-radius: 20px;
+        }
+
+        #button1:hover {
+            background-color: green;
+        }
+
+        #box2 {
+            background-color: white;
+            border: solid 1px;
+            border-radius: 20px;
+            height: 200px;
+            width: 550px;
+            position: absolute;
+            margin-top: 35rem;
+            left: 50px;
+            padding: 20px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+
+<body>
+    <div id="box1">
+        <h1>Grade Calculator</h1>
+
+        <p id="absenttext">Absences</p>
+        <input type="number" id="input1" name="absent" max="100" min="0" required placeholder="0"> <br>
+
+        <p id="p2">Prelim Exam Grade</p>
+        <input type="number" id="input2" name="prelim_exam_grade" max="100" min="0" required placeholder="0-100">
+
+        <p id="p3">Quizzes Grade</p>
+        <input type="number" id="input3" name="quizzes_grade" max="100" min="0" required placeholder="0-100">
+
+        <p id="p4">Requirement Grade</p>
+        <input type="number" id="input4" name="requirements_grade" max="100" min="0" required placeholder="0-100">
+
+        <p id="p5">Recitation Grade</p>
+        <input type="number" id="input5" name="recitation" max="100" min="0" required placeholder="0-100">
+
+        <div id="box2">
+            <h2>Results:</h2>
+            <p id="prelim_grade"></p>
+            <p id="midfinalgrade"></p>
+            <p id="deans_list_grade"></p>
+            <p id="dean_failed"></p>
+        </div>
+    </div>
+    <button id="button1" py-click="calculate()">Calculate</button>
+
+    <py-script>
+        from pyscript import Element
+    
+        def calculate():
+            absences_value = Element("input1").element.value
+            prelim_value = Element("input2").element.value
+            quiz_value = Element("input3").element.value
+            requirements_value = Element("input4").element.value
+            recitation_value = Element("input5").element.value
+    
+            
+            if not absences_value or not prelim_value or not quiz_value or not requirements_value or not recitation_value:
+                Element("prelim_grade").element.innerHTML = "INVALID VALUE - Please fill out all fields."
+                Element("midfinalgrade").element.innerHTML = ""
+                Element("deans_list_grade").element.innerHTML = ""
+                Element("dean_failed").element.innerHTML = ""
+                return
+            
+            
+            absences = int(absences_value)
+            prelim_grade = float(prelim_value)
+            quiz = float(quiz_value)
+            requirements_grade = float(requirements_value)
+            recitation = float(recitation_value)
+            
+            
+            if not (0 <= absences <= 10) or not (0 <= prelim_grade <= 100) or not (0 <= quiz <= 100) or not (0 <= requirements_grade <= 100) or not (0 <= recitation <= 100):
+                Element("prelim_grade").element.innerHTML = "INPUTS SHOULD BE BETWEEN 0-100"
+                Element("midfinalgrade").element.innerHTML = ""
+                Element("deans_list_grade").element.innerHTML = ""
+                Element("dean_failed").element.innerHTML = ""
+                return
+    
+            mid_term = 0.3
+            final_term = 0.5
+            target_grade = 75
+            dean_grade = 90
+    
+            # Attendance calculation
+            attendance = 100 - (absences * 10)
+    
+            # Class standing calculation
+            class_standing = (quiz * 0.4) + (requirements_grade * 0.3) + (recitation * 0.3)
+    
+            # Prelim grade calculation
+            prelim_grade_computation = (prelim_grade * 0.6) + (attendance * 0.1) + (class_standing * 0.3)
+    
+            # Target grade calculation
+            prelim_part = target_grade - (prelim_grade_computation * 0.2)
+            answer = round(prelim_part / (mid_term + final_term), 2)
+    
+            # Dean's list grade calculation
+            prelim_part_dean = dean_grade - (prelim_grade_computation * 0.2)
+            answer_dean = round(prelim_part_dean / (mid_term + final_term), 2)
+    
+            
+            if absences < 4:
+                prelim_announce = f"Your prelim grade is: {round(prelim_grade_computation, 2)}"
+                midfinal_announce = f"Your required grade for midterm and final is: {answer}"
+                deanlister_announce = f"To be eligible for Dean's Lister you need a grade of: {answer_dean}"
+                failed = ""
+            else:
+                prelim_announce = ""
+                midfinal_announce = ""
+                deanlister_announce = ""
+                failed = "FAILED DUE TO ABSENCES BEING GREATER OR EQUAL TO 4"
+    
+            # RESULTS
+            Element("prelim_grade").element.innerHTML = prelim_announce
+            Element("midfinalgrade").element.innerHTML = midfinal_announce
+            Element("deans_list_grade").element.innerHTML = deanlister_announce
+            Element("dean_failed").element.innerHTML = failed
+    </py-script>
+    
+    
+
+
+</body>
+</html>
